@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FairTasker - Fair Gigs, No Rip-Off Fees</title>
+  <meta name="description" content="FairTasker: $5 flat claim fee. Taskers keep 100%. Better than AirTasker."/>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 1rem; background: #f8f9fa; color: #333; }
+    header { background: #2c7; color: white; padding: 1rem; text-align: center; }
+    h1 { margin: 0; }
+    .tagline { font-size: 1.1rem; margin: 0.5rem 0; }
+    .container { max-width: 800px; margin: 2rem auto; }
+    form { display: flex; flex-direction: column; gap: 1rem; background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    label { font-weight: bold; }
+    input, textarea, select, button { padding: 0.8rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; }
+    button { background: #2c7; color: white; border: none; cursor: pointer; }
+    button:hover { background: #1a5; }
+    #auth { margin-bottom: 1rem; text-align: center; }
+    #userStatus { font-weight: bold; color: #2c7; }
+    #error { color: red; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>FairTasker</h1>
+  <p class="tagline">$5 flat. No percentage cuts. Taskers keep what they earn.</p>
+</header>
+
+<div class="container">
+
+  <div id="auth">
+    <button id="signInBtn">Sign in with Email (optional – for dashboard)</button>
+    <p id="userStatus">Not signed in</p>
+  </div>
+
+  <h2>Post a Job</h2>
+  <form id="jobForm">
+    <label>Job Title</label>
+    <input type="text" id="title" required placeholder="e.g. Move boxes from garage"/>
+
+    <label>Description</label>
+    <textarea id="desc" rows="4" required placeholder="What needs doing? Tools? Details?"></textarea>
+
+    <label>Category</label>
+    <select id="category" required>
+      <option value="">Choose one</option>
+      <option value="moving">Moving</option>
+      <option value="cleaning">Cleaning</option>
+      <option value="handyman">Handyman</option>
+      <option value="gardening">Gardening</option>
+      <option value="assembly">Assembly</option>
+      <option value="delivery">Delivery</option>
+      <option value="tech">Tech Help</option>
+      <option value="other">Other</option>
+    </select>
+
+    <label>Skill Needed</label>
+    <select id="skill" required>
+      <option value="">Any</option>
+      <option value="none">No experience</option>
+      <option value="basic">Basic tools</option>
+      <option value="power">Power tools</option>
+      <option value="licensed">Licensed tradie</option>
+    </select>
+
+    <label>Call-out Fee (first hour, min $40 AUD)</label>
+    <input type="number" id="callout" min="40" step="5" required value="40"/>
+
+    <label>Rate After First Hour ($25/hr min)</label>
+    <input type="number" id="rate" min="25" step="5" required value="25"/>
+
+    <label>Estimated Hours</label>
+    <input type="number" id="hours" min="1" step="0.5" required value="3"/>
+
+    <label>Postcode (for map)</label>
+    <input type="text" id="postcode" placeholder="e.g. 2000" maxlength="4"/>
+
+    <button type="submit">Post Job</button>
+  </form>
+
+  <p id="error"></p>
+
+</div>
+
+<script type="module">
+  // Firebase imports
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getAuth, signInWithEmailLink, isSignInWithEmailLink, sendSignInLinkToEmail } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+  // Your config
+  const firebaseConfig = {
+    apiKey: "AIzaSyBgmc0dDRDJAJncaQFIsw3U2gUOes5RHIA",
+    authDomain: "taskmate-123.firebaseapp.com",
+    projectId: "taskmate-123",
+    storageBucket: "taskmate-123.firebasestorage.app",
+    messagingSenderId: "783596986866",
+    appId: "1:783596986866:web:936b7a7127c7c96f4acb6b",
+    measurementId: "G-4Z2FV4Y86H"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Sign-in magic link
+  const signInBtn = document.getElementById('signInBtn');
+  const userStatus = document.getElementById('userStatus');
+  const errorMsg = document.getElementById('error');
+
+  signInBtn.addEventListener('click', async () => {
+    const email = prompt('Enter your email:');
+    if (!email) return;
+
+    const actionCodeSettings = {
+      url: window.location.href,
+      handleCodeInApp: true
+    };
+
+    try {
+      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+      window.localStorage.setItem('emailForSignIn', email);
+      alert('Check your email for the link!');
+    } catch (err) {
+      errorMsg.textContent = err.message;
+    }
+  });
+
+  // Handle link click
+  if (isSignInWithEmailLink(auth, window.location.href)) {
+    let email = window.localStorage.getItem('emailForSignIn');
+    if (!email) {
+      email = prompt('Enter the email you used:');
+    }
+
+    try {
+      const result = await signInWithEmailLink(auth, email, window.location.href);
+      window.localStorage.removeItem('emailForSignIn');
+      userStatus.textContent = `Signed in as ${result.user.email}`;
+    } catch (err) {
+      errorMsg.textContent = err.message;
+    }
+  }
+
+  // Form submit (save job to Firestore)
+  document.getElementById('jobForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!auth.currentUser) {
+      alert('Sign in first for dashboard tracking!');
+      return;
+    }
+
+    const job = {
+      title: document.getElementById('title').value,
+      desc: document.getElementById('desc').value,
+      category: document.getElementById('category').value,
+      skill: document.getElementById('skill').value,
+      callout: Number(document.getElementById('callout').value),
+      rate: Number(document.getElementById('rate').value),
+      hours: Number(document.getElementById('hours').value),
+      postcode: document.getElementById('postcode').value,
+      posterId: auth.currentUser.uid,
+      status: 'open',
+      createdAt: new Date()
+    };
+
+    try {
+      await addDoc(collection(db, 'jobs'), job);
+      alert('Job posted!');
+      e.target.reset();
+    } catch (err) {
+      errorMsg.textContent = err.message;
+    }
+  });
+</script>
+
+</body>
+</html>
