@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FairTasker - Verify Payment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#10b981',
+            primaryDark: '#047857',
+            accent: '#8b5cf6'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-slate-100 text-gray-900 dark:bg-slate-950 dark:text-gray-100">
+  <header class="sticky top-0 z-20 border-b border-white/20 bg-white/70 backdrop-blur-xl dark:border-gray-800/80 dark:bg-gray-950/70">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+      <div class="flex items-center gap-3">
+        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-lg font-black text-white shadow-lg">F</span>
+        <div>
+          <h1 class="text-xl font-black tracking-tight sm:text-2xl">FairTasker</h1>
+          <p class="text-xs text-gray-600 dark:text-gray-400">Verify Payment</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-2xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="rounded-2xl border border-white/50 bg-white/80 p-8 shadow-2xl backdrop-blur-xl dark:border-gray-800 dark:bg-gray-900/75">
+      <h2 class="mb-4 text-3xl font-black">Verify Payment & Complete Job</h2>
+      <div id="verifyContent" class="space-y-6">
+        <p class="text-gray-600 dark:text-gray-400">Loading job details...</p>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getFirestore, getDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB2Gy0yd9sKYn_yBJmP4u6XKRW90v8NbmY",
+      authDomain: "taskmate-123.firebaseapp.com",
+      projectId: "taskmate-123",
+      storageBucket: "taskmate-123.firebasestorage.app",
+      messagingSenderId: "783596986866",
+      appId: "1:783596986866:web:936b7a7127c7c96f4acb6b",
+      measurementId: "G-4Z2FV4Y86H"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const content = document.getElementById('verifyContent');
+
+    // Get jobId from URL
+    const params = new URLSearchParams(window.location.search);
+    const jobId = params.get('jobId');
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!jobId) {
+        content.innerHTML = '<p class="text-red-600 dark:text-red-400">Invalid verification link. No job ID provided.</p>';
+        return;
+      }
+
+      try {
+        const jobRef = doc(db, 'jobs', jobId);
+        const jobSnap = await getDoc(jobRef);
+
+        if (!jobSnap.exists()) {
+          content.innerHTML = '<p class="text-red-600 dark:text-red-400">Job not found.</p>';
+          return;
+        }
+
+        const job = jobSnap.data();
+        const total = job.callout + (job.rate * job.hours);
+        const platformFee = 5;
+
+        content.innerHTML = `
+          <div class="space-y-4">
+            <h3 class="text-2xl font-black text-gray-900 dark:text-gray-100">${job.title}</h3>
+            <p class="text-gray-600 dark:text-gray-400">${job.desc.substring(0, 200)}</p>
+            
+            <div class="grid grid-cols-2 gap-4 rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
+              <div>
+                <p class="text-xs text-gray-600 dark:text-gray-400">Total Amount</p>
+                <p class="text-2xl font-black text-primary">$${total}</p>
+              </div>
+              <div>
+                <p class="text-xs text-gray-600 dark:text-gray-400">Platform Fee</p>
+                <p class="text-xl font-black text-gray-900 dark:text-gray-100">$${platformFee}</p>
+              </div>
+            </div>
+
+            <div class="rounded-lg border-2 border-primary/20 bg-primary/5 p-4">
+              <p class="mb-3 flex items-center gap-2 text-sm font-semibold text-primary">
+                <span>✓</span> Tasker has confirmed receipt of payment
+              </p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                By clicking below, you confirm that you have paid the tasker and the job is complete.
+              </p>
+            </div>
+
+            <button id="confirmBtn" class="w-full rounded-lg bg-primary px-6 py-3 font-black text-white shadow-lg transition hover:bg-primaryDark hover:-translate-y-0.5">
+              Confirm Payment Received
+            </button>
+
+            ${job.posterVerified ? `<p class="rounded-lg bg-green-100 p-3 text-center font-semibold text-green-700 dark:bg-green-500/10 dark:text-green-300">✓ Payment verified on ${new Date(job.posterVerified.toDate()).toLocaleDateString()}</p>` : ''}
+          </div>
+        `;
+
+        const confirmBtn = document.getElementById('confirmBtn');
+        if (confirmBtn && !job.posterVerified) {
+          confirmBtn.addEventListener('click', async () => {
+            try {
+              const timestamp = new Date();
+              await updateDoc(jobRef, {
+                posterVerified: timestamp,
+                status: 'completed'
+              });
+
+              content.innerHTML = `
+                <div class="rounded-lg bg-green-100 p-4 text-center dark:bg-green-500/10">
+                  <p class="text-lg font-black text-green-700 dark:text-green-300">✓ Job Completed!</p>
+                  <p class="text-sm text-green-600 dark:text-green-300 mt-2">Payment verified. Thank you for using FairTasker.</p>
+                </div>
+              `;
+
+              // TODO: Send completion email to tasker
+              // await fetch('/api/send-completion-email', { method: 'POST', body: JSON.stringify({ jobId, taskerId: job.claimantId }) });
+            } catch (err) {
+              console.log('Verification error:', err);
+              content.innerHTML = '<p class="text-red-600 dark:text-red-400">Error verifying payment. Please try again.</p>';
+            }
+          });
+        }
+      } catch (err) {
+        console.log('Load error:', err);
+        content.innerHTML = '<p class="text-red-600 dark:text-red-400">Error loading job details.</p>';
+      }
+    });
+  </script>
+</body>
+</html>
