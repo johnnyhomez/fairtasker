@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:css": "npx postcss src/input.css -o src/output.css",
+    "watch:css": "npx postcss src/input.css -o src/output.css --watch"
   },
   "keywords": [],
   "author": "",
@@ -12,5 +14,12 @@
   "type": "commonjs",
   "dependencies": {
     "firebase": "^12.10.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.1",
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.8",
+    "postcss-cli": "^11.0.1",
+    "tailwindcss": "^4.2.1"
   }
 }
