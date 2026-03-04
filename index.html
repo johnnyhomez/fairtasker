@@ -199,7 +199,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getAuth, signInWithEmailLink, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithPhoneNumber, RecaptchaVerifier, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, getDocs, getDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, query, where, orderBy, getDocs, getDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 
     const firebaseConfig = {
@@ -306,25 +306,7 @@
 
     // Refresh jobs feed (enable Claim buttons if signed in)
     async function refreshJobsFeed() {
-      const jobsFeedCards = document.querySelectorAll('[data-job-id]');
-      jobsFeedCards.forEach(card => {
-        const claimBtn = card.querySelector('.claim-btn');
-        if (claimBtn && auth.currentUser) {
-          claimBtn.classList.remove('bg-gray-300', 'cursor-not-allowed', 'dark:bg-gray-700');
-          claimBtn.classList.add('bg-primary', 'hover:bg-primaryDark');
-          claimBtn.removeAttribute('disabled');
-          claimBtn.textContent = 'Claim ($5)';
-          
-          if (!claimBtn.dataset.listenerAdded) {
-            claimBtn.addEventListener('click', async () => {
-              const jobId = claimBtn.dataset.jobId;
-              const jobTitle = claimBtn.dataset.jobTitle;
-              await initiateStripeCheckout(jobId, jobTitle, auth.currentUser.uid);
-            });
-            claimBtn.dataset.listenerAdded = 'true';
-          }
-        }
-      });
+      await fetchAndRenderJobsFeed();
     }
 
     // Photo preview
@@ -682,16 +664,49 @@
       }
     };
 
-    // Set up real-time listener
+    // Polling job feed for MVP (every 5 seconds)
     const jobsQuery = query(collection(db, 'jobs'), where('status', '==', 'open'), orderBy('createdAt', 'desc'));
-    onSnapshot(jobsQuery, (snapshot) => {
-      loadingSpinner.classList.add('hidden');
-      const jobs = snapshot.docs;
-      renderJobsFeed(jobs);
-    }, (error) => {
-      console.log('Feed error:', error);
-      loadingSpinner.innerHTML = '<p class="text-red-600 dark:text-red-400">Error loading jobs. Please refresh.</p>';
+    let jobFeedPollerId = null;
+    let lastAuthUid = auth.currentUser ? auth.currentUser.uid : null;
+
+    async function fetchAndRenderJobsFeed() {
+      try {
+        const snapshot = await getDocs(jobsQuery);
+        loadingSpinner.classList.add('hidden');
+        renderJobsFeed(snapshot.docs);
+      } catch (error) {
+        console.log('Feed error:', error);
+        loadingSpinner.innerHTML = '<p class="text-red-600 dark:text-red-400">Error loading jobs. Please refresh.</p>';
+      }
+    }
+
+    function clearJobFeedPolling() {
+      if (jobFeedPollerId) {
+        clearInterval(jobFeedPollerId);
+        jobFeedPollerId = null;
+      }
+    }
+
+    function startJobFeedPolling() {
+      clearJobFeedPolling();
+      fetchAndRenderJobsFeed();
+      jobFeedPollerId = setInterval(fetchAndRenderJobsFeed, 5000);
+    }
+
+    window.addEventListener('beforeunload', () => {
+      clearJobFeedPolling();
     });
+
+    onAuthStateChanged(auth, (user) => {
+      const signedOut = lastAuthUid && !user;
+      lastAuthUid = user ? user.uid : null;
+      if (signedOut) {
+        clearJobFeedPolling();
+      }
+      startJobFeedPolling();
+    });
+
+    startJobFeedPolling();
 
     // Job form submit
     document.getElementById('jobForm').addEventListener('submit', async (e) => {
