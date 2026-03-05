@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About FairTasker - Fair Gigs, No Commission Marketplace</title>
+  <meta name="description" content="Learn about FairTasker's mission to revolutionize the gig economy. Fair pricing, zero predatory commissions, transparent earnings. Built for taskers and job posters in Australia."/>
+  <meta name="keywords" content="fair gig economy, commission-free jobs, fair trade marketplace, gig worker rights, transparent pricing, no commission platform"/>
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://fairtasker.vercel.app/about.html"/>
+  <meta property="og:title" content="About FairTasker"/>
+  <meta property="og:description" content="Fair gigs, zero commission. FairTasker is built for taskers and job posters who believe in fairness."/>
+  
+  <!-- Canonical -->
+  <link rel="canonical" href="https://fairtasker.vercel.app/about.html"/>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sonner@latest"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#10b981',
+            primaryDark: '#047857',
+            accent: '#8b5cf6'
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    html, body { font-family: 'Inter', sans-serif; }
+    .glass-card { @apply rounded-2xl border border-white/30 bg-white/70 backdrop-blur-xl shadow-xl transition-all duration-300 dark:border-gray-800/50 dark:bg-gray-900/50; }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-white via-slate-50 to-slate-100 text-gray-900 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 dark:text-gray-100 transition-colors duration-300">
+  
+  <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+    <div class="absolute -top-40 -left-20 h-80 w-80 rounded-full bg-primary/20 blur-3xl opacity-60 dark:opacity-30"></div>
+    <div class="absolute top-1/2 -right-32 h-96 w-96 rounded-full bg-accent/20 blur-3xl opacity-50 dark:opacity-25"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 border-b border-white/40 bg-white/60 backdrop-blur-2xl dark:border-gray-800/60 dark:bg-gray-950/60">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+      <a href="/" class="flex items-center gap-3 transition hover:scale-105">
+        <span class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-lg font-black text-white shadow-lg">F</span>
+        <div>
+          <h1 class="text-xl font-black tracking-tight sm:text-2xl">FairTasker</h1>
+          <p class="text-xs font-medium text-primary dark:text-emerald-400">Fair gigs. Zero fees.</p>
+        </div>
+      </a>
+      
+      <div class="hidden md:flex items-center gap-1">
+        <a href="/" class="rounded-lg px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-200/50 dark:text-gray-300 dark:hover:bg-gray-800/50">Home</a>
+        <a href="/#post-form" class="rounded-lg px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-200/50 dark:text-gray-300 dark:hover:bg-gray-800/50">Post Job</a>
+        <a href="/about.html" class="rounded-lg px-4 py-2 text-sm font-semibold text-primary dark:text-emerald-400">About</a>
+      </div>
+      
+      <div class="flex items-center gap-3">
+        <button id="themeToggle" class="rounded-xl border border-gray-300 bg-white/70 px-3 py-2 text-xs sm:text-sm font-semibold text-gray-700 transition hover:shadow-lg dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-200">🌙</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+    <!-- Hero -->
+    <section class="mb-16 space-y-8">
+      <div>
+        <span class="inline-flex items-center rounded-full bg-emerald-100/80 px-3 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">About Us</span>
+        <h1 class="mt-4 text-5xl font-black leading-tight">Fair Gigs. Zero Rip-Off Fees.</h1>
+        <p class="mt-6 text-xl text-gray-600 dark:text-gray-400">FairTasker is revolutionizing the gig economy by putting taskers first and eliminating predatory commission structures that trap workers in poverty.</p>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-3">
+        <div class="glass-card p-6 text-center">
+          <h3 class="text-2xl font-black text-primary dark:text-emerald-300">$5</h3>
+          <p class="mt-2 text-sm font-semibold text-gray-600 dark:text-gray-400">Flat claim fee</p>
+        </div>
+        <div class="glass-card p-6 text-center">
+          <h3 class="text-2xl font-black text-primary dark:text-emerald-300">100%</h3>
+          <p class="mt-2 text-sm font-semibold text-gray-600 dark:text-gray-400">Taskers keep earnings</p>
+        </div>
+        <div class="glass-card p-6 text-center">
+          <h3 class="text-2xl font-black text-primary dark:text-emerald-300">24/7</h3>
+          <p class="mt-2 text-sm font-semibold text-gray-600 dark:text-gray-400">Job availability</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mission -->
+    <section class="mb-16 space-y-6">
+      <h2 class="text-4xl font-black">Our Mission</h2>
+      <p class="text-lg text-gray-600 dark:text-gray-400">
+        We believe the gig economy has been exploited. Major platforms like AirTasker, Fiverr, and Upwork take 20-30% commissions, while taskers and creators struggle to earn a living. This isn't fair.
+      </p>
+      <p class="text-lg text-gray-600 dark:text-gray-400">
+        FairTasker exists to prove that a better platform is possible. One where taskers keep what they earn. Where job posters get quality work without predatory fees. Where transparency and fairness aren't buzzwords—they're the foundation.
+      </p>
+    </section>
+
+    <!-- Values -->
+    <section class="mb-16 space-y-8">
+      <h2 class="text-4xl font-black">Our Values</h2>
+      
+      <div class="space-y-6">
+        <div class="glass-card p-8">
+          <h3 class="text-2xl font-black text-primary dark:text-emerald-300">🤝 Fairness First</h3>
+          <p class="mt-3 text-gray-600 dark:text-gray-400">We don't profit from taskers' desperation. Our business model works when yours does, with transparent, ethical pricing.</p>
+        </div>
+
+        <div class="glass-card p-8">
+          <h3 class="text-2xl font-black text-primary dark:text-emerald-300">💰 Transparent Earnings</h3>
+          <p class="mt-3 text-gray-600 dark:text-gray-400">No hidden fees. No surprise commissions. You know exactly what you earn before you claim a job. Every dollar is accounted for.</p>
+        </div>
+
+        <div class="glass-card p-8">
+          <h3 class="text-2xl font-black text-primary dark:text-emerald-300">🔐 Security & Trust</h3>
+          <p class="mt-3 text-gray-600 dark:text-gray-400">Firebase-backed infrastructure, secure payments, and protected transactions. Your data is yours alone.</p>
+        </div>
+
+        <div class="glass-card p-8">
+          <h3 class="text-2xl font-black text-primary dark:text-emerald-300">🌍 Local First</h3>
+          <p class="mt-3 text-gray-600 dark:text-gray-400">Starting in Australia, we're focused on meaningful local work. No race-to-the-bottom global pricing.</p>
+        </div>
+
+        <div class="glass-card p-8">
+          <h3 class="text-2xl font-black text-primary dark:text-emerald-300">⚡ Simplicity</h3>
+          <p class="mt-3 text-gray-600 dark:text-gray-400">Post. Claim. Work. Get paid. No convoluted dashboards or confusing contract terms.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="mb-16 space-y-8">
+      <h2 class="text-4xl font-black">How It Works</h2>
+      
+      <div class="space-y-4">
+        <div class="glass-card p-6">
+          <div class="flex gap-4">
+            <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/20 text-sm font-black text-primary dark:bg-primary/10">1</span>
+            <div>
+              <h3 class="font-black">Post a Job</h3>
+              <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Describe what needs doing. Upload photos. Set fair pricing. It takes 2 minutes.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card p-6">
+          <div class="flex gap-4">
+            <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/20 text-sm font-black text-primary dark:bg-primary/10">2</span>
+            <div>
+              <h3 class="font-black">Taskers See & Claim</h3>
+              <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Real taskers browse live jobs. They claim with a $5 fee. No bots. No spam.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card p-6">
+          <div class="flex gap-4">
+            <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/20 text-sm font-black text-primary dark:bg-primary/10">3</span>
+            <div>
+              <h3 class="font-black">Work & Verify</h3>
+              <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Job gets done. Tasker marks complete. You both confirm. Zero disputes.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card p-6">
+          <div class="flex gap-4">
+            <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/20 text-sm font-black text-primary dark:bg-primary/10">4</span>
+            <div>
+              <h3 class="font-black">Get Paid</h3>
+              <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Tasker keeps 100% of earnings (minus the $5). You keep what you posted for. Done.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comparison -->
+    <section class="mb-16 space-y-8">
+      <h2 class="text-4xl font-black">Why FairTasker?</h2>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-300 dark:border-gray-700">
+              <th class="px-4 py-3 text-left font-black">Feature</th>
+              <th class="px-4 py-3 text-center font-black text-primary dark:text-emerald-300">FairTasker</th>
+              <th class="px-4 py-3 text-center font-black">AirTasker</th>
+              <th class="px-4 py-3 text-center font-black">Airtasker</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-gray-200 dark:border-gray-800">
+              <td class="px-4 py-3 font-semibold">Platform Fee</td>
+              <td class="px-4 py-3 text-center text-primary dark:text-emerald-300 font-black">$5 flat</td>
+              <td class="px-4 py-3 text-center">20% 😱</td>
+              <td class="px-4 py-3 text-center">Variable</td>
+            </tr>
+            <tr class="border-b border-gray-200 dark:border-gray-800">
+              <td class="px-4 py-3 font-semibold">What Taskers Keep</td>
+              <td class="px-4 py-3 text-center text-primary dark:text-emerald-300 font-black">100%</td>
+              <td class="px-4 py-3 text-center">80%</td>
+              <td class="px-4 py-3 text-center">Variable</td>
+            </tr>
+            <tr class="border-b border-gray-200 dark:border-gray-800">
+              <td class="px-4 py-3 font-semibold">Transparency</td>
+              <td class="px-4 py-3 text-center text-primary dark:text-emerald-300 font-black">✓ Full</td>
+              <td class="px-4 py-3 text-center">Limited</td>
+              <td class="px-4 py-3 text-center">Confusing</td>
+            </tr>
+            <tr class="border-b border-gray-200 dark:border-gray-800">
+              <td class="px-4 py-3 font-semibold">Local Focus</td>
+              <td class="px-4 py-3 text-center text-primary dark:text-emerald-300 font-black">✓ Australia</td>
+              <td class="px-4 py-3 text-center">Global</td>
+              <td class="px-4 py-3 text-center">Global</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="mb-16 space-y-8">
+      <h2 class="text-4xl font-black">Coming Soon</h2>
+      <p class="text-gray-600 dark:text-gray-400">
+        FairTasker is launch-ready. Early taskers and job posters will shape the platform. Join us on this mission to fix the gig economy.
+      </p>
+      <a href="/" class="inline-block rounded-xl gradient-bg px-8 py-4 font-bold text-white shadow-lg transition hover:shadow-xl hover:scale-105">
+        Get Started Now
+      </a>
+    </section>
+
+    <!-- FAQ -->
+    <section class="mb-16 space-y-8">
+      <h2 class="text-4xl font-black">FAQ</h2>
+      
+      <div class="space-y-4">
+        <details class="glass-card p-6 cursor-pointer group">
+          <summary class="font-black text-lg">Is FairTasker really free for taskers?</summary>
+          <p class="mt-4 text-gray-600 dark:text-gray-400">Mostly yes. There's a $5 claim fee paid by the job poster. Taskers keep 100% of agreed earnings. No hidden percentages.</p>
+        </details>
+
+        <details class="glass-card p-6 cursor-pointer group">
+          <summary class="font-black text-lg">How does FairTasker make money?</summary>
+          <p class="mt-4 text-gray-600 dark:text-gray-400">We take 30% of the claim fee initially, reinvesting into platform development. Future: subscription plans for premium features (optional).</p>
+        </details>
+
+        <details class="glass-card p-6 cursor-pointer group">
+          <summary class="font-black text-lg">When does payment happen?</summary>
+          <p class="mt-4 text-gray-600 dark:text-gray-400">Currently in beta. Full payment processing (Stripe) coming post-launch. Taskers get paid within 2 business days.</p>
+        </details>
+
+        <details class="glass-card p-6 cursor-pointer group">
+          <summary class="font-black text-lg">Is it safe?</summary>
+          <p class="mt-4 text-gray-600 dark:text-gray-400">Yes. Firebase security. encrypted data. escrow model in development. Both parties protected.</p>
+        </details>
+
+        <details class="glass-card p-6 cursor-pointer group">
+          <summary class="font-black text-lg">Only Australia?</summary>
+          <p class="mt-4 text-gray-600 dark:text-gray-400">Currently yes. We're focused on Australian gig workers. Expansion planned once we nail the local market.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-16 border-t border-white/40 bg-white/40 backdrop-blur-xl dark:border-gray-800/60 dark:bg-gray-950/40">
+    <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div class="grid gap-8 md:grid-cols-4">
+        <div>
+          <h3 class="font-black">FairTasker</h3>
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Fair gigs. Zero rip-off fees.</p>
+        </div>
+        <div>
+          <h4 class="font-semibold">Platform</h4>
+          <ul class="mt-3 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li><a href="/" class="hover:text-primary">Home</a></li>
+            <li><a href="#" class="hover:text-primary">Browse Jobs</a></li>
+            <li><a href="/about.html" class="hover:text-primary">About</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold">Support</h4>
+          <ul class="mt-3 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li><a href="mailto:hi@fairtasker.com" class="hover:text-primary">Contact</a></li>
+            <li><a href="#" class="hover:text-primary">Privacy Policy</a></li>
+            <li><a href="#" class="hover:text-primary">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-8 border-t border-white/20 py-6 dark:border-gray-800 text-sm text-gray-600 dark:text-gray-400">
+        <p>&copy; 2026 FairTasker. Built for fairness. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Dark mode
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+      themeToggle.textContent = '☀️';
+    } else {
+      themeToggle.textContent = '🌙';
+    }
+    themeToggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      themeToggle.textContent = isDark ? '☀️' : '🌙';
+    });
+  </script>
+</body>
+</html>

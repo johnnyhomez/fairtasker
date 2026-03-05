@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /about.html
+Disallow: /dashboard.html
+
+# Allow crawling of assets
+Allow: /*.js
+Allow: /*.css
+
+# Sitemap
+Sitemap: https://fairtasker.vercel.app/sitemap.xml
+
+# Crawl delay (be nice to server)
+Crawl-delay: 1

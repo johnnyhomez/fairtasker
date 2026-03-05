@@ -1,20 +1,29 @@
 {
-  "name": "taskmate",
+  "name": "fairtasker",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Fair gigs, zero rip-off platform fees. FairTasker: Taskers keep 100%, transparent pricing, Australian gig marketplace.",
+  "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:css": "npx postcss src/input.css -o src/output.css",
-    "watch:css": "npx postcss src/input.css -o src/output.css --watch"
+    "watch:css": "npx postcss src/input.css -o src/output.css --watch",
+    "dev": "npx http-server . -p 3000 -o",
+    "start": "npx http-server . -p 3000"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "gig economy",
+    "local jobs",
+    "fair trade",
+    "no commission",
+    "task marketplace",
+    "Australia"
+  ],
+  "author": "FairTasker",
+  "license": "MIT",
   "type": "commonjs",
   "dependencies": {
-    "firebase": "^12.10.0",
-    "stripe": "^20.4.0"
+    "firebase": "^10.14.1",
+    "sonner": "^1.0.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.1",
@@ -24,3 +33,4 @@
     "tailwindcss": "^4.2.1"
   }
 }
+

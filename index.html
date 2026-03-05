@@ -1,13 +1,44 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FairTasker - Fair Gigs, No Rip-Off Fees</title>
-  <meta name="description" content="FairTasker: $5 flat claim fee. Taskers keep 100%. Better than AirTasker."/>
+  <title>FairTasker - Fair Gigs, No Commission Jobs Australia</title>
+  <meta name="description" content="FairTasker: $5 flat fee gigs. Taskers keep 100%. Local jobs in Australia with transparent pricing—no predatory commissions. Hire or work on flexible tasks."/>
+  <meta name="keywords" content="gig economy Australia, local tasks, no commission jobs, fair gigs, task marketplace, flexible work, job post Australia, tasker jobs, local hiring, fair trade jobs, AirTasker alternative, economic fairness, side hustle australia, freelance work, casual jobs, peer-to-peer jobs"/>
+  <meta name="theme-color" content="#10b981"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  
+  <!-- Open Graph / Social Share -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://fairtasker.vercel.app/"/>
+  <meta property="og:title" content="FairTasker - Fair Gigs, No Commission Jobs"/>
+  <meta property="og:description" content="Post local jobs or find work on Australia's fairest gig platform. $5 flat fee. Taskers keep 100%."/>
+  <meta property="og:image" content="https://fairtasker.vercel.app/og-image.png"/>
+  
+  <!-- Twitter Card -->
+  <meta property="twitter:card" content="summary_large_image"/>
+  <meta property="twitter:url" content="https://fairtasker.vercel.app/"/>
+  <meta property="twitter:title" content="FairTasker - Fair Gigs Platform"/>
+  <meta property="twitter:description" content="Fair task marketplace with no commission. Taskers keep 100%."/>
+  <meta property="twitter:image" content="https://fairtasker.vercel.app/og-image.png"/>
+  
+  <!-- Canonical -->
+  <link rel="canonical" href="https://fairtasker.vercel.app/"/>
+  
+  <!-- Preconnect to Firebase -->
+  <link rel="preconnect" href="https://www.googleapis.com"/>
+  <link rel="preconnect" href="https://www.gstatic.com"/>
+  
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script src="https://js.stripe.com/v3/"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sonner@latest"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js"></script>
+  <script src="https://www.google.com/recaptcha/api.js"></script>
+  
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -16,791 +47,365 @@
           colors: {
             primary: '#10b981',
             primaryDark: '#047857',
-            accent: '#8b5cf6'
+            accent: '#8b5cf6',
+            accentDark: '#6d28d9'
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          },
+          animation: {
+            fadeIn: 'fadeIn 0.5s ease-in-out',
+            slideUp: 'slideUp 0.3s ease-out'
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' }
+            },
+            slideUp: {
+              '0%': { transform: 'translateY(10px)', opacity: '0' },
+              '100%': { transform: 'translateY(0)', opacity: '1' }
+            }
           }
         }
       }
     }
   </script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    
+    html, body { font-family: 'Inter', sans-serif; }
+    
+    .glass-card {
+      @apply rounded-2xl border border-white/30 bg-white/70 backdrop-blur-xl shadow-xl transition-all duration-300;
+      @apply dark:border-gray-800/50 dark:bg-gray-900/50;
+    }
+    
+    .glass-card:hover {
+      @apply shadow-2xl;
+      @apply dark:border-gray-700/80;
+    }
+    
+    .gradient-bg {
+      background: linear-gradient(135deg, #10b981 0%, #8b5cf6 100%);
+    }
+    
+    .loading-spinner {
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 3px solid white;
+      width: 24px;
+      height: 24px;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  </style>
 </head>
-<body class="min-h-screen bg-slate-100 text-gray-900 dark:bg-slate-950 dark:text-gray-100 transition-colors duration-300 font-sans antialiased">
+<body class="min-h-screen bg-gradient-to-br from-white via-slate-50 to-slate-100 text-gray-900 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 dark:text-gray-100 transition-colors duration-300">
+  
+  <!-- Animated background gradients -->
   <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-    <div class="absolute -top-24 -left-16 h-72 w-72 rounded-full bg-primary/30 blur-3xl"></div>
-    <div class="absolute top-1/3 -right-20 h-80 w-80 rounded-full bg-accent/30 blur-3xl"></div>
-    <div class="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl"></div>
+    <div class="absolute -top-40 -left-20 h-80 w-80 rounded-full bg-primary/20 blur-3xl opacity-60 dark:opacity-30"></div>
+    <div class="absolute top-1/2 -right-32 h-96 w-96 rounded-full bg-accent/20 blur-3xl opacity-50 dark:opacity-25"></div>
+    <div class="absolute -bottom-24 left-1/3 h-80 w-80 rounded-full bg-cyan-400/15 blur-3xl opacity-40 dark:opacity-20"></div>
   </div>
 
-  <header class="sticky top-0 z-20 border-b border-white/20 bg-white/70 backdrop-blur-xl dark:border-gray-800/80 dark:bg-gray-950/70">
-    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-      <div class="flex items-center gap-3">
-        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-lg font-black text-white shadow-lg">F</span>
+  <!-- Header with Navigation -->
+  <header class="sticky top-0 z-40 border-b border-white/40 bg-white/60 backdrop-blur-2xl dark:border-gray-800/60 dark:bg-gray-950/60">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-3 transition hover:scale-105">
+        <span class="inline-flex h-11 w-11 items-center justify-center rounded-xl gradient-bg text-lg font-black text-white shadow-lg">F</span>
         <div>
           <h1 class="text-xl font-black tracking-tight sm:text-2xl">FairTasker</h1>
-          <p class="text-xs text-gray-600 dark:text-gray-400">Fair gigs. Zero rip-off platform fees.</p>
+          <p class="text-xs font-medium text-primary dark:text-emerald-400">Fair gigs. Zero fees.</p>
         </div>
+      </a>
+      
+      <!-- Nav Links -->
+      <div class="hidden md:flex items-center gap-1">
+        <a href="/" class="nav-link rounded-lg px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-200/50 dark:text-gray-300 dark:hover:bg-gray-800/50">Home</a>
+        <a href="/#post-form" class="nav-link rounded-lg px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-200/50 dark:text-gray-300 dark:hover:bg-gray-800/50">Post Job</a>
+        <a href="/dashboard.html" class="nav-link rounded-lg px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-200/50 dark:text-gray-300 dark:hover:bg-gray-800/50">Dashboard</a>
+        <a href="/about.html" class="nav-link rounded-lg px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-200/50 dark:text-gray-300 dark:hover:bg-gray-800/50">About</a>
       </div>
-      <div class="flex items-center gap-4">
-        <div class="flex gap-2">
-          <button id="homeTab" class="tab-btn rounded-lg bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800" data-tab="home">Home</button>
-          <button id="dashboardTab" class="tab-btn rounded-lg px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-gray-200/50 dark:text-gray-400 dark:hover:bg-gray-800/50" data-tab="dashboard">Dashboard</button>
+      
+      <!-- Right Actions -->
+      <div class="flex items-center gap-3">
+        <button id="themeToggle" class="rounded-xl border border-gray-300 bg-white/70 px-3 py-2 text-xs sm:text-sm font-semibold text-gray-700 transition hover:shadow-lg dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-200" title="Toggle dark/light mode">
+          <span id="themeIcon">🌙</span>
+        </button>
+        <div id="authContainer" class="flex items-center gap-2">
+          <button id="authMenuBtn" class="rounded-xl bg-gradient-to-r from-primary to-primaryDark px-4 py-2 text-xs sm:text-sm font-bold text-white shadow-lg transition hover:shadow-xl hover:scale-105">
+            Sign In
+          </button>
         </div>
-        <button id="themeToggle" class="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200">
-          Light Mode
+        <span id="userEmail" class="hidden text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400"></span>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Auth Modals -->
+  <div id="authModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="glass-card w-full max-w-md animate-slideUp">
+      <div class="border-b border-white/20 px-6 py-4 dark:border-gray-800">
+        <h2 class="text-2xl font-black">Sign In</h2>
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Unlimited access, no quota limits</p>
+      </div>
+      <div class="space-y-3 p-6">
+        <button id="googleSignInBtn" class="w-full flex items-center justify-center gap-2 rounded-xl bg-white border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-900 transition hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700">
+          <svg class="h-5 w-5" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Google
+        </button>
+        <button id="phoneSignInBtn" class="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600">
+          📱 Phone (SMS)
+        </button>
+        <button id="emailSignInBtn" class="w-full flex items-center justify-center gap-2 rounded-xl bg-purple-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600">
+          ✉️ Email Magic Link
+        </button>
+        <button id="closeAuthModal" class="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+          Cancel
         </button>
       </div>
     </div>
-  </header>
+  </div>
 
-  <main id="homeSection" class="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-5 lg:px-8 lg:py-12">
-    <section class="space-y-6 lg:col-span-2">
-      <div class="rounded-3xl border border-white/50 bg-white/75 p-8 shadow-2xl backdrop-blur-xl dark:border-gray-800 dark:bg-gray-900/70">
-        <span class="inline-flex rounded-full bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-primary">Built for fairness</span>
-        <h2 class="mt-4 text-3xl font-black leading-tight sm:text-4xl">Hire faster. Pay fairly. Keep more.</h2>
-        <p class="mt-4 text-gray-600 dark:text-gray-300">Post local jobs in minutes with transparent pricing and no predatory commissions. Clean, simple, and tasker-first.</p>
-        <div class="mt-6 grid grid-cols-3 gap-3 text-center">
-          <div class="rounded-2xl bg-gray-900 p-3 text-white dark:bg-gray-800">
-            <p class="text-xl font-black">$5</p>
-            <p class="text-xs opacity-80">claim fee</p>
+  <!-- Phone Auth Modal -->
+  <div id="phoneAuthModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="glass-card w-full max-w-md animate-slideUp">
+      <div class="border-b border-white/20 px-6 py-4 dark:border-gray-800">
+        <h2 class="text-2xl font-black">Sign In with Phone</h2>
+      </div>
+      <div class="space-y-4 p-6">
+        <div id="phoneNumberDiv" class="space-y-2"></div>
+        <div id="phoneRecaptchaDiv" class="flex justify-center"></div>
+        <div id="phoneCodeDiv" class="hidden space-y-2">
+          <input id="phoneCodeInput" type="text" placeholder="Enter 6-digit code" class="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-900"/>
+          <button id="verifyPhoneBtn" class="w-full rounded-lg bg-primary px-4 py-2 font-semibold text-white transition hover:bg-primaryDark">Verify</button>
+        </div>
+        <button id="closePhoneModal" class="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold transition dark:border-gray-700">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Email Auth Modal -->
+  <div id="emailAuthModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="glass-card w-full max-w-md animate-slideUp">
+      <div class="border-b border-white/20 px-6 py-4 dark:border-gray-800">
+        <h2 class="text-2xl font-black">Sign In with Email</h2>
+      </div>
+      <div class="space-y-4 p-6">
+        <input id="emailInput" type="email" placeholder="your@email.com" class="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-900"/>
+        <button id="sendEmailLinkBtn" class="w-full rounded-lg bg-purple-600 px-4 py-2 font-semibold text-white transition hover:bg-purple-700">Send Magic Link</button>
+        <button id="closeEmailModal" class="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold transition dark:border-gray-700">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <!-- Hero + Post Form -->
+    <section class="mb-12 grid gap-8 lg:grid-cols-5">
+      <!-- Hero Section -->
+      <div class="space-y-6 lg:col-span-2">
+        <div class="glass-card p-8">
+          <span class="inline-flex items-center rounded-full bg-emerald-100/80 px-3 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">⚡ Built for Fairness</span>
+          <h1 class="mt-4 text-4xl font-black leading-tight sm:text-5xl">Hire faster. Pay fairly. Keep more.</h1>
+          <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">Post local jobs in minutes with transparent pricing. No predatory commissions. Clean, simple, and tasker-first.</p>
+          
+          <div class="mt-8 grid grid-cols-3 gap-4">
+            <div class="rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 dark:from-emerald-900/20 dark:to-emerald-900/10">
+              <p class="text-2xl font-black text-emerald-700 dark:text-emerald-300">$5</p>
+              <p class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">claim fee</p>
+            </div>
+            <div class="rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 p-4">
+              <p class="text-2xl font-black text-primary dark:text-emerald-300">100%</p>
+              <p class="text-xs font-semibold text-primary/80 dark:text-emerald-400">tasker keeps</p>
+            </div>
+            <div class="rounded-2xl bg-gradient-to-br from-accent/20 to-accent/10 p-4">
+              <p class="text-2xl font-black text-accent dark:text-purple-300">24/7</p>
+              <p class="text-xs font-semibold text-accent/80 dark:text-purple-400">job flow</p>
+            </div>
           </div>
-          <div class="rounded-2xl bg-primary p-3 text-white">
-            <p class="text-xl font-black">100%</p>
-            <p class="text-xs opacity-80">tasker keeps</p>
-          </div>
-          <div class="rounded-2xl bg-accent p-3 text-white">
-            <p class="text-xl font-black">24/7</p>
-            <p class="text-xs opacity-80">job flow</p>
-          </div>
+        </div>
+
+        <div class="glass-card p-6">
+          <h3 class="font-black text-lg">Why FairTasker?</h3>
+          <ul class="mt-4 space-y-3 text-sm">
+            <li class="flex gap-2"><span class="text-primary font-bold">✓</span><span>No predatory commissions</span></li>
+            <li class="flex gap-2"><span class="text-primary font-bold">✓</span><span>Pay what jobs are worth</span></li>
+            <li class="flex gap-2"><span class="text-primary font-bold">✓</span><span>Quick task matching</span></li>
+            <li class="flex gap-2"><span class="text-primary font-bold">✓</span><span>Transparent pricing</span></li>
+          </ul>
         </div>
       </div>
 
-      <div class="rounded-3xl border border-white/50 bg-white/75 p-6 shadow-xl backdrop-blur-xl dark:border-gray-800 dark:bg-gray-900/70">
-        <button id="signInBtn" class="w-full rounded-2xl bg-gradient-to-r from-primary to-primaryDark px-6 py-4 text-base font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-2xl">
-          Sign in with Email
-        </button>
-        <button id="phoneSignInBtn" class="mt-3 w-full rounded-2xl bg-blue-600 px-6 py-4 text-base font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-2xl">
-          Sign in with Phone
-        </button>
-        <button id="googleSignInBtn" class="mt-3 w-full rounded-2xl bg-red-600 px-6 py-4 text-base font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-2xl">
-          Sign in with Google
-        </button>
-        <p id="userStatus" class="mt-4 rounded-xl bg-primary/10 px-4 py-3 text-center text-sm font-semibold text-primary">Not signed in</p>
-        <p class="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">Testing? Use test phone: +1 555-555-5555, code 123456 (no real SMS)</p>
+      <!-- Post Job Form -->
+      <div class="lg:col-span-3">
+        <div class="glass-card p-8" id="post-form">
+          <h2 class="flex items-center justify-between text-3xl font-black">
+            Post a Job
+            <span class="inline-flex items-center rounded-full bg-emerald-100/80 px-3 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">Live</span>
+          </h2>
+          
+          <form id="jobForm" class="mt-8 space-y-6">
+            <!-- Title -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Job Title *</label>
+              <input id="jobTitle" type="text" required placeholder="e.g., Furniture Assembly, House Cleaning" class="mt-2 w-full rounded-lg border border-gray-300 bg-white/50 px-4 py-3 text-gray-900 transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-900/50 dark:text-white"/>
+            </div>
+
+            <!-- Description -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Description *</label>
+              <textarea id="jobDescription" required placeholder="What needs to be done?" rows="4" class="mt-2 w-full rounded-lg border border-gray-300 bg-white/50 px-4 py-3 text-gray-900 transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-900/50 dark:text-white"></textarea>
+            </div>
+
+            <!-- Category & Postcode Row -->
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Category *</label>
+                <select id="jobCategory" required class="mt-2 w-full rounded-lg border border-gray-300 bg-white/50 px-4 py-3 transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-900/50 dark:text-white">
+                  <option value="">Select category</option>
+                  <option value="cleaning">Cleaning</option>
+                  <option value="handyman">Handyman</option>
+                  <option value="moving">Moving & Delivery</option>
+                  <option value="outdoors">Outdoors & Gardening</option>
+                  <option value="tech">Tech & IT</option>
+                  <option value="creative">Creative & Writing</option>
+                  <option value="assembly">Assembly & Install</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Postcode *</label>
+                <input id="jobPostcode" type="text" required placeholder="e.g., 2000" class="mt-2 w-full rounded-lg border border-gray-300 bg-white/50 px-4 py-3 text-gray-900 transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-900/50 dark:text-white"/>
+              </div>
+            </div>
+
+            <!-- Pricing Row -->
+            <div class="grid gap-4 sm:grid-cols-3">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Rate ($) *</label>
+                <input id="jobRate" type="number" required min="0" step="0.01" placeholder="0.00" class="mt-2 w-full rounded-lg border border-gray-300 bg-white/50 px-4 py-3 text-gray-900 transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-900/50 dark:text-white"/>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Type *</label>
+                <select id="jobRateType" required class="mt-2 w-full rounded-lg border border-gray-300 bg-white/50 px-4 py-3 transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-900/50 dark:text-white">
+                  <option value="fixed">Fixed Price</option>
+                  <option value="hourly">Hourly Rate</option>
+                </select>
+              </div>
+              <div id="hoursContainer" class="hidden">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Est. Hours</label>
+                <input id="jobHours" type="number" min="0" step="0.5" placeholder="0" class="mt-2 w-full rounded-lg border border-gray-300 bg-white/50 px-4 py-3 text-gray-900 transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-900/50 dark:text-white"/>
+              </div>
+            </div>
+
+            <!-- Photo Upload -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Photos (Drag & Drop)</label>
+              <div id="photoDropZone" class="mt-2 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50/50 p-6 text-center transition hover:border-primary hover:bg-primary/5 dark:border-gray-700 dark:bg-gray-900/30 dark:hover:border-primary dark:hover:bg-primary/10">
+                <svg class="mx-auto h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 16v-4m0 0V8m0 4h4m-4 0H8m4 12a8 8 0 100-16 8 8 0 000 16z"/>
+                </svg>
+                <p class="mt-2 text-sm font-medium text-gray-600 dark:text-gray-400">Drag photos here or <span class="text-primary cursor-pointer">click to upload</span></p>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-500">Max 10MB, auto-compress to 300x300px, JPEG quality 0.85</p>
+                <input id="photoInput" type="file" multiple accept="image/*" class="hidden"/>
+              </div>
+              <div id="photoPreviewContainer" class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"></div>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="w-full rounded-xl gradient-bg px-6 py-4 text-base font-bold text-white shadow-lg transition hover:shadow-xl hover:scale-105">
+              Post Job ($5 Fee)
+            </button>
+          </form>
+        </div>
       </div>
     </section>
 
-    <section class="lg:col-span-3">
-      <div class="rounded-3xl border border-white/50 bg-white/80 p-6 shadow-2xl backdrop-blur-xl sm:p-8 dark:border-gray-800 dark:bg-gray-900/75">
-        <div class="mb-8 flex items-center justify-between gap-4">
-          <h3 class="text-2xl font-black sm:text-3xl">Post a Job</h3>
-          <span class="rounded-full bg-gray-900 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white dark:bg-gray-700">Live Form</span>
+    <!-- Feed Section -->
+    <section>
+      <div class="mb-8 flex items-center justify-between gap-4">
+        <div>
+          <h2 class="text-3xl font-black">Open Gigs</h2>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">Find your next task • Live updates every 5 seconds</p>
         </div>
+        <div class="flex items-center gap-2">
+          <span id="feedStatus" class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-xs font-semibold text-primary dark:bg-primary/20">
+            <span class="h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+            Live
+          </span>
+        </div>
+      </div>
 
-        <form id="jobForm" class="space-y-6">
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Job Title</label>
-            <input type="text" id="title" required placeholder="e.g. Move boxes from garage" class="mt-2 block w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm shadow-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100">
-          </div>
+      <div id="jobFeed" class="grid gap-6 md:grid-cols-3">
+        <!-- Job cards populated here -->
+      </div>
 
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Description</label>
-            <textarea id="desc" rows="5" required placeholder="What needs doing? Tools? Details?" class="mt-2 block w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm shadow-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"></textarea>
-          </div>
-
-          <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Category</label>
-              <select id="category" required class="mt-2 block w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm shadow-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100">
-                <option value="">Choose one</option>
-                <option value="moving">Moving</option>
-                <option value="cleaning">Cleaning</option>
-                <option value="handyman">Handyman</option>
-                <option value="gardening">Gardening</option>
-                <option value="assembly">Assembly</option>
-                <option value="delivery">Delivery</option>
-                <option value="tech">Tech Help</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Skill Needed</label>
-              <select id="skill" required class="mt-2 block w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm shadow-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100">
-                <option value="">Any</option>
-                <option value="none">No experience</option>
-                <option value="basic">Basic tools</option>
-                <option value="power">Power tools</option>
-                <option value="licensed">Licensed tradie</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Call-out Fee (min $40 AUD)</label>
-              <input type="number" id="callout" min="40" step="5" required value="40" class="mt-2 block w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm shadow-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100">
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Rate After First Hour ($25/hr min)</label>
-              <input type="number" id="rate" min="25" step="5" required value="25" class="mt-2 block w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm shadow-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100">
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Estimated Hours</label>
-              <input type="number" id="hours" min="1" step="0.5" required value="3" class="mt-2 block w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm shadow-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100">
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Postcode (for map)</label>
-            <input type="text" id="postcode" placeholder="e.g. 2000" maxlength="4" class="mt-2 block w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm shadow-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100">
-          </div>
-
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Add Photos (optional)</label>
-            <div id="dropZone" class="mt-2 rounded-2xl border-2 border-dashed border-gray-400 bg-gray-50 p-8 text-center transition hover:border-primary hover:bg-primary/10 dark:border-gray-700 dark:bg-gray-800/70">
-              <p class="font-medium text-gray-700 dark:text-gray-300">Drag & drop or click to upload</p>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">JPG, PNG, WEBP</p>
-              <input type="file" id="photos" accept="image/*" multiple hidden />
-            </div>
-            <div id="preview" class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4"></div>
-          </div>
-
-          <button type="submit" class="w-full rounded-2xl bg-gradient-to-r from-primary to-primaryDark px-6 py-4 text-base font-black tracking-wide text-white shadow-xl transition hover:-translate-y-0.5 hover:shadow-2xl">
-            Post Job
-          </button>
-        </form>
-
-        <p id="error" class="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm font-semibold text-red-600 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300"></p>
+      <div id="emptyState" class="rounded-2xl border-2 border-dashed border-gray-300 px-8 py-12 text-center dark:border-gray-700">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <h3 class="mt-4 text-lg font-bold">No jobs yet</h3>
+        <p class="mt-1 text-gray-600 dark:text-gray-400">Be the first to post! 👆</p>
       </div>
     </section>
   </main>
 
-  <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-    <h2 class="mb-8 text-3xl font-black sm:text-4xl">Open Jobs</h2>
-    <div id="loadingSpinner" class="flex justify-center py-12">
-      <div class="h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-primary dark:border-gray-700 dark:border-t-primary"></div>
-    </div>
-    <div id="jobsFeed" class="grid gap-6 md:grid-cols-3"></div>
-  </section>
-
-  <section id="dashboardSection" class="hidden mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-    <h2 class="mb-8 text-3xl font-black sm:text-4xl">Dashboard</h2>
-    <div id="dashboardContent" class="space-y-8">
-      <div class="rounded-2xl border border-white/50 bg-white/80 p-8 backdrop-blur-xl dark:border-gray-800 dark:bg-gray-900/75">
-        <h3 class="mb-4 text-2xl font-black">My Posted Jobs</h3>
-        <div id="postedJobs" class="grid gap-4 md:grid-cols-2"></div>
-      </div>
-      <div class="rounded-2xl border border-white/50 bg-white/80 p-8 backdrop-blur-xl dark:border-gray-800 dark:bg-gray-900/75">
-        <h3 class="mb-4 text-2xl font-black">Jobs I've Claimed</h3>
-        <div id="claimedJobs" class="grid gap-4 md:grid-cols-2"></div>
-      </div>
-    </div>
-  </section>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getAuth, signInWithEmailLink, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithPhoneNumber, RecaptchaVerifier, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, query, where, orderBy, getDocs, getDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyB2Gy0yd9sKYn_yBJmP4u6XKRW90v8NbmY",
-      authDomain: "taskmate-123.firebaseapp.com",
-      projectId: "taskmate-123",
-      storageBucket: "taskmate-123.firebasestorage.app",
-      messagingSenderId: "783596986866",
-      appId: "1:783596986866:web:936b7a7127c7c96f4acb6b",
-      measurementId: "G-4Z2FV4Y86H"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
-    const stripe = Stripe('pk_test_51234567890');
-
-    const signInBtn = document.getElementById('signInBtn');
-    const userStatus = document.getElementById('userStatus');
-    const errorMsg = document.getElementById('error');
-    const dropZone = document.getElementById('dropZone');
-    const photosInput = document.getElementById('photos');
-    const preview = document.getElementById('preview');
-    const themeToggle = document.getElementById('themeToggle');
-
-    // Dark mode toggle
-    themeToggle.addEventListener('click', () => {
-      document.documentElement.classList.toggle('dark');
-      themeToggle.textContent = document.documentElement.classList.contains('dark') ? 'Light Mode' : 'Dark Mode';
-    });
-
-    // Sign-in
-    signInBtn.addEventListener('click', async () => {
-      const email = prompt('Enter your email:');
-      if (!email) return;
-
-      const actionCodeSettings = {
-        url: 'https://fairtasker.vercel.app/',
-        handleCodeInApp: true
-      };
-
-      try {
-        await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-        window.localStorage.setItem('emailForSignIn', email);
-        alert('Check your email for the link!');
-      } catch (err) {
-        errorMsg.textContent = err.message;
-      }
-    });
-
-    if (isSignInWithEmailLink(auth, window.location.href)) {
-      let email = window.localStorage.getItem('emailForSignIn');
-      if (!email) email = prompt('Enter the email you used:');
-
-      try {
-        const result = await signInWithEmailLink(auth, email, window.location.href);
-        window.localStorage.removeItem('emailForSignIn');
-        userStatus.textContent = `Signed in as ${result.user.email}`;
-        await refreshJobsFeed();
-      } catch (err) {
-        errorMsg.textContent = err.message;
-      }
-    }
-
-    // Phone Sign-In
-    const phoneSignInBtn = document.getElementById('phoneSignInBtn');
-    phoneSignInBtn.addEventListener('click', async () => {
-      const phoneNumber = prompt('Enter your phone number (e.g., +61412345678):');
-      if (!phoneNumber) return;
-
-      try {
-        const recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-          size: 'invisible',
-          callback: () => {}
-        }, auth);
-
-        const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
-        const verificationCode = prompt('Enter the verification code sent to your phone:');
-        
-        if (!verificationCode) return;
-
-        const result = await confirmationResult.confirm(verificationCode);
-        userStatus.textContent = `Signed in as ${result.user.phoneNumber}`;
-        await refreshJobsFeed();
-      } catch (err) {
-        console.log('Phone sign-in error:', err);
-        alert('Phone sign-in failed: ' + err.message);
-      }
-    });
-
-    // Google Sign-In
-    const googleSignInBtn = document.getElementById('googleSignInBtn');
-    googleSignInBtn.addEventListener('click', async () => {
-      try {
-        const googleProvider = new GoogleAuthProvider();
-        const result = await signInWithPopup(auth, googleProvider);
-        userStatus.textContent = `Signed in as ${result.user.email}`;
-        await refreshJobsFeed();
-      } catch (err) {
-        console.log('Google sign-in error:', err);
-        alert('Google sign-in failed: ' + err.message);
-      }
-    });
-
-    // Refresh jobs feed (enable Claim buttons if signed in)
-    async function refreshJobsFeed() {
-      await fetchAndRenderJobsFeed();
-    }
-
-    // Photo preview
-    dropZone.addEventListener('click', () => photosInput.click());
-    photosInput.addEventListener('change', handleFiles);
-
-    dropZone.addEventListener('dragover', e => {
-      e.preventDefault();
-      dropZone.classList.add('border-primary', 'bg-primary/10');
-    });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-primary', 'bg-primary/10'));
-    dropZone.addEventListener('drop', e => {
-      e.preventDefault();
-      dropZone.classList.remove('border-primary', 'bg-primary/10');
-      handleFiles(e.dataTransfer.files);
-    });
-
-    function handleFiles(files) {
-      preview.innerHTML = '';
-      Array.from(files || photosInput.files).forEach(file => {
-        if (!file.type.startsWith('image/')) return;
-        const reader = new FileReader();
-        reader.onload = e => {
-          const img = document.createElement('img');
-          img.src = e.target.result;
-          img.className = 'w-full h-32 object-cover rounded-lg shadow-md';
-          preview.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // Compress image using canvas: max 300x300px, quality 0.7
-    async function compressImage(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = new Image();
-          img.onload = () => {
-            try {
-              const canvas = document.createElement('canvas');
-              const ctx = canvas.getContext('2d');
-              const maxWidth = 300;
-              const maxHeight = 300;
-              let width = img.width;
-              let height = img.height;
-
-              if (width > height) {
-                if (width > maxWidth) {
-                  height = (height * maxWidth) / width;
-                  width = maxWidth;
-                }
-              } else {
-                if (height > maxHeight) {
-                  width = (width * maxHeight) / height;
-                  height = maxHeight;
-                }
-              }
-
-              canvas.width = width;
-              canvas.height = height;
-              ctx.drawImage(img, 0, 0, width, height);
-
-              canvas.toBlob(
-                (blob) => resolve(blob),
-                'image/jpeg',
-                0.7
-              );
-            } catch (err) {
-              reject(err);
-            }
-          };
-          img.onerror = () => reject(new Error('Failed to load image'));
-          img.src = e.target.result;
-        };
-        reader.onerror = () => reject(new Error('Failed to read file'));
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // Real-time job feed
-    const jobsFeed = document.getElementById('jobsFeed');
-    const loadingSpinner = document.getElementById('loadingSpinner');
-
-    function renderJobCard(job, jobId) {
-      const thumbnailUrl = job.photos && job.photos.length > 0 
-        ? job.photos[0] 
-        : 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22%3E%3Crect fill=%22%23e5e7eb%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22system-ui%22 font-size=%2224%22 fill=%22%239ca3af%22%3ENo image%3C/text%3E%3C/svg%3E';
-      
-      const descSnippet = (job.desc || '').substring(0, 100) + (job.desc && job.desc.length > 100 ? '...' : '');
-      
-      const card = document.createElement('div');
-      card.id = `job-${jobId}`;
-      card.className = 'overflow-hidden rounded-2xl border border-white/50 bg-white/80 shadow-xl transition hover:scale-105 dark:border-gray-800 dark:bg-gray-900/75';
-      
-      card.innerHTML = `
-        <img src="${thumbnailUrl}" alt="Job thumbnail" class="h-48 w-full object-cover rounded-t-2xl">
-        <div class="p-6 space-y-4">
-          <h3 class="text-lg font-black text-gray-900 dark:text-gray-100">${job.title}</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-400">${descSnippet}</p>
-          
-          <div class="flex flex-wrap gap-2">
-            <span class="inline-flex rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">${job.category}</span>
-          </div>
-          
-          <div class="grid grid-cols-3 gap-2 text-center text-xs">
-            <div class="rounded bg-gray-100 p-2 dark:bg-gray-800">
-              <p class="font-black text-gray-900 dark:text-gray-100">$${job.callout}</p>
-              <p class="text-gray-600 dark:text-gray-400">call-out</p>
-            </div>
-            <div class="rounded bg-gray-100 p-2 dark:bg-gray-800">
-              <p class="font-black text-gray-900 dark:text-gray-100">$${job.rate}/hr</p>
-              <p class="text-gray-600 dark:text-gray-400">after 1h</p>
-            </div>
-            <div class="rounded bg-gray-100 p-2 dark:bg-gray-800">
-              <p class="font-black text-gray-900 dark:text-gray-100">${job.hours}h</p>
-              <p class="text-gray-600 dark:text-gray-400">est.</p>
-            </div>
-          </div>
-          
-          <p class="text-xs text-gray-500 dark:text-gray-500">📍 ${job.postcode || 'N/A'}</p>
-          
-          <button class="claim-btn w-full rounded-lg ${auth.currentUser ? 'bg-primary hover:bg-primaryDark' : 'bg-gray-300 cursor-not-allowed dark:bg-gray-700'} px-4 py-2 font-semibold text-white transition" data-job-id="${jobId}" data-job-title="${job.title}" data-poster-id="${job.posterId}" ${auth.currentUser ? '' : 'disabled'}>
-            ${auth.currentUser ? 'Claim ($5)' : 'Sign in to claim'}
-          </button>
+  <!-- Footer -->
+  <footer class="mt-16 border-t border-white/40 bg-white/40 backdrop-blur-xl dark:border-gray-800/60 dark:bg-gray-950/40">
+    <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div class="grid gap-8 md:grid-cols-4">
+        <div>
+          <h3 class="font-black">FairTasker</h3>
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Fair gigs. Zero rip-off fees.</p>
         </div>
-      `;
-      
-      const claimBtn = card.querySelector('.claim-btn');
-      if (auth.currentUser) {
-        claimBtn.addEventListener('click', async () => {
-          if (!auth.currentUser) return;
-          const claimJobId = claimBtn.dataset.jobId;
-          claimBtn.textContent = 'Processing...';
-          claimBtn.disabled = true;
-          await initiateStripeCheckout(claimJobId, claimBtn);
-        });
-      }
-      
-      return card;
-    }
-
-    function renderJobsFeed(jobs) {
-      jobsFeed.innerHTML = '';
-      if (jobs.length === 0) {
-        jobsFeed.innerHTML = '<p class="col-span-3 text-center text-gray-600 dark:text-gray-400">No open jobs available. Check back soon!</p>';
-        return;
-      }
-      jobs.forEach(doc => {
-        const existingCard = document.getElementById(`job-${doc.id}`);
-        if (existingCard) existingCard.remove();
-        jobsFeed.appendChild(renderJobCard(doc.data(), doc.id));
-      });
-    }
-
-    // Tab switching
-    document.getElementById('homeTab').addEventListener('click', () => {
-      document.getElementById('homeSection').classList.remove('hidden');
-      document.getElementById('dashboardSection').classList.add('hidden');
-      document.getElementById('homeTab').classList.add('bg-white', 'dark:bg-gray-900');
-      document.getElementById('homeTab').classList.remove('text-gray-600', 'dark:text-gray-400');
-      document.getElementById('dashboardTab').classList.remove('bg-white', 'dark:bg-gray-900');
-      document.getElementById('dashboardTab').classList.add('text-gray-600', 'dark:text-gray-400');
-    });
-
-    document.getElementById('dashboardTab').addEventListener('click', async () => {
-      document.getElementById('homeSection').classList.add('hidden');
-      document.getElementById('dashboardSection').classList.remove('hidden');
-      document.getElementById('dashboardTab').classList.add('bg-white', 'dark:bg-gray-900');
-      document.getElementById('dashboardTab').classList.remove('text-gray-600', 'dark:text-gray-400');
-      document.getElementById('homeTab').classList.remove('bg-white', 'dark:bg-gray-900');
-      document.getElementById('homeTab').classList.add('text-gray-600', 'dark:text-gray-400');
-      
-      if (auth.currentUser) {
-        await loadDashboardJobs();
-      } else {
-        document.getElementById('dashboardContent').innerHTML = '<p class="text-center text-gray-600 dark:text-gray-400">Sign in to view your jobs.</p>';
-      }
-    });
-
-    // Stripe Checkout Handler
-    function initiateStripeCheckout(jobId, claimBtn) {
-      return fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jobId, claimantId: auth.currentUser ? auth.currentUser.uid : null })
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (!data.sessionId) {
-            throw new Error('Missing sessionId');
-          }
-          return stripe.redirectToCheckout({ sessionId: data.sessionId });
-        })
-        .then((result) => {
-          if (result && result.error) {
-            throw result.error;
-          }
-        })
-        .catch((err) => {
-          console.log('Stripe error:', err);
-          alert('Payment failed');
-          if (claimBtn) {
-            claimBtn.textContent = 'Claim ($5)';
-            claimBtn.disabled = false;
-          }
-        });
-    }
-
-    async function handleCheckoutSuccess(user) {
-      const params = new URLSearchParams(window.location.search);
-      const isSuccess = params.get('success') === 'true';
-      const jobId = params.get('jobId');
-      if (!isSuccess || !jobId || !user) return;
-
-      try {
-        const jobRef = doc(db, 'jobs', jobId);
-        await updateDoc(jobRef, {
-          status: 'claimed',
-          claimantId: user.uid
-        });
-        alert('Claimed!');
-        await refreshJobsFeed();
-      } catch (err) {
-        console.log('Claim success update error:', err);
-      } finally {
-        const cleanUrl = `${window.location.origin}${window.location.pathname}`;
-        window.history.replaceState({}, document.title, cleanUrl);
-      }
-    }
-
-    // Receipt Generator using html2pdf
-    async function generateReceipt(job, jobId, taskerEmail, posterEmail) {
-      const total = job.callout + (job.rate * job.hours);
-      const platformFee = 5;
-      const taskerEarnings = total - platformFee;
-
-      const receiptHTML = `
-        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: white; color: #333;">
-          <h1 style="text-align: center; color: #10b981;">FairTasker Receipt</h1>
-          <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
-          
-          <h2>Job Details</h2>
-          <p><strong>Job ID:</strong> ${jobId}</p>
-          <p><strong>Title:</strong> ${job.title}</p>
-          <p><strong>Category:</strong> ${job.category}</p>
-          <p><strong>Description:</strong> ${job.desc.substring(0, 200)}</p>
-          <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-          
-          <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
-          
-          <h2>Payment Breakdown</h2>
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr style="border-bottom: 1px solid #ddd;">
-              <td style="padding: 10px;">Call-out Fee</td>
-              <td style="text-align: right; padding: 10px;">$${job.callout}</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #ddd;">
-              <td style="padding: 10px;">Hourly Rate × Hours</td>
-              <td style="text-align: right; padding: 10px;">$${job.rate} × ${job.hours}h = $${job.rate * job.hours}</td>
-            </tr>
-            <tr style="border-bottom: 2px solid #ddd;">
-              <td style="padding: 10px;"><strong>Total Earned</strong></td>
-              <td style="text-align: right; padding: 10px;"><strong>$${total}</strong></td>
-            </tr>
-            <tr style="border-bottom: 1px solid #ddd; background: #f9fafb;">
-              <td style="padding: 10px;">Platform Fee</td>
-              <td style="text-align: right; padding: 10px;">-$${platformFee}</td>
-            </tr>
-            <tr style="background: #f0fdf4;">
-              <td style="padding: 10px;"><strong>Tasker Gets</strong></td>
-              <td style="text-align: right; padding: 10px;"><strong style="color: #10b981; font-size: 18px;">$${taskerEarnings}</strong></td>
-            </tr>
-          </table>
-          
-          <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
-          
-          <h2>Parties</h2>
-          <p><strong>Poster Email:</strong> ${posterEmail}</p>
-          <p><strong>Tasker Email:</strong> ${taskerEmail}</p>
-          
-          <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
-          <p style="text-align: center; font-size: 12px; color: #999;">FairTasker © 2026 | Fair gigs. Zero rip-off platform fees.</p>
+        <div>
+          <h4 class="font-semibold">Platform</h4>
+          <ul class="mt-3 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li><a href="/" class="hover:text-primary">Home</a></li>
+            <li><a href="/dashboard.html" class="hover:text-primary">Dashboard</a></li>
+            <li><a href="/about.html" class="hover:text-primary">About</a></li>
+          </ul>
         </div>
-      `;
+        <div>
+          <h4 class="font-semibold">Support</h4>
+          <ul class="mt-3 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li><a href="mailto:hi@fairtasker.com" class="hover:text-primary">Contact</a></li>
+            <li><a href="#" class="hover:text-primary">Privacy Policy</a></li>
+            <li><a href="#" class="hover:text-primary">Terms of Service</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold">Connect</h4>
+          <ul class="mt-3 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li><a href="#" class="hover:text-primary">Twitter</a></li>
+            <li><a href="#" class="hover:text-primary">LinkedIn</a></li>
+            <li><a href="#" class="hover:text-primary">Instagram</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-8 border-t border-white/20 py-6 dark:border-gray-800 text-sm text-gray-600 dark:text-gray-400">
+        <p>&copy; 2026 FairTasker. Built for fairness. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
-      const opt = { margin: 10, filename: `receipt-${jobId}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' } };
-      html2pdf().set(opt).from(receiptHTML).save();
-    }
-
-    // Load Dashboard Jobs
-    async function loadDashboardJobs() {
-      if (!auth.currentUser) return;
-      const userId = auth.currentUser.uid;
-
-      try {
-        // Posted jobs
-        const postedQuery = query(collection(db, 'jobs'), where('posterId', '==', userId));
-        const postedDocs = await getDocs(postedQuery);
-        const postedJobsDiv = document.getElementById('postedJobs');
-        postedJobsDiv.innerHTML = '';
-
-        if (postedDocs.empty) {
-          postedJobsDiv.innerHTML = '<p class="text-gray-600 dark:text-gray-400">No posted jobs yet.</p>';
-        } else {
-          postedDocs.forEach(doc => {
-            const job = doc.data();
-            const card = document.createElement('div');
-            card.className = 'rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800';
-            card.innerHTML = `
-              <h4 class="font-black text-gray-900 dark:text-gray-100">${job.title}</h4>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Status: <strong>${job.status}</strong></p>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Posted: ${new Date(job.createdAt.toDate()).toLocaleDateString()}</p>
-              ${job.claimantId ? `<p class="text-sm text-primary"><strong>Claimed by:</strong> ${job.claimantId}</p>` : ''}
-            `;
-            postedJobsDiv.appendChild(card);
-          });
-        }
-
-        // Claimed jobs
-        const claimedQuery = query(collection(db, 'jobs'), where('claimantId', '==', userId));
-        const claimedDocs = await getDocs(claimedQuery);
-        const claimedJobsDiv = document.getElementById('claimedJobs');
-        claimedJobsDiv.innerHTML = '';
-
-        if (claimedDocs.empty) {
-          claimedJobsDiv.innerHTML = '<p class="text-gray-600 dark:text-gray-400">No claimed jobs yet.</p>';
-        } else {
-          claimedDocs.forEach(doc => {
-            const job = doc.data();
-            const isClaimant = job.claimantId === userId;
-            const card = document.createElement('div');
-            card.className = 'rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800';
-            card.innerHTML = `
-              <h4 class="font-black text-gray-900 dark:text-gray-100">${job.title}</h4>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Status: <strong>${job.status}</strong></p>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Posted: ${new Date(job.createdAt.toDate()).toLocaleDateString()}</p>
-              ${job.status === 'claimed' && isClaimant ? `
-                <button class="mt-2 rounded bg-primary px-3 py-1 text-sm font-semibold text-white hover:bg-primaryDark" onclick="completeJob('${doc.id}', '${job.posterId}')">Complete & Generate Receipt</button>
-              ` : ''}
-            `;
-            claimedJobsDiv.appendChild(card);
-          });
-        }
-      } catch (err) {
-        console.log('Dashboard error:', err);
-        document.getElementById('dashboardContent').innerHTML = '<p class="text-red-600 dark:text-red-400">Error loading dashboard.</p>';
-      }
-    }
-
-    // Complete Job and Generate Receipt
-    window.completeJob = async (jobId, posterId) => {
-      try {
-        // Get job data
-        const jobRef = doc(db, 'jobs', jobId);
-        const jobSnap = await getDoc(jobRef);
-        if (!jobSnap.exists()) return alert('Job not found');
-
-        const job = jobSnap.data();
-        const taskerEmail = auth.currentUser.email;
-
-        // Get poster email (optional - would require user collection)
-        const posterEmail = 'poster@example.com'; // Placeholder
-
-        // Generate receipt
-        await generateReceipt(job, jobId, taskerEmail, posterEmail);
-
-        // Mark tasker verified
-        const timestamp = new Date();
-        await updateDoc(jobRef, { taskerVerified: timestamp });
-
-        alert('Receipt generated! Mark as verified once you confirm payment receipt.');
-
-        // TODO: In production, send email to poster with receipt and verification link
-        // await fetch('/api/send-verification-email', { method: 'POST', body: JSON.stringify({ jobId, posterEmail, taskerId: auth.currentUser.uid }) });
-      } catch (err) {
-        console.log('Complete job error:', err);
-        alert('Error processing job completion.');
-      }
-    };
-
-    // Polling job feed for MVP (every 5 seconds)
-    const jobsQuery = query(collection(db, 'jobs'), where('status', '==', 'open'), orderBy('createdAt', 'desc'));
-    let jobFeedPollerId = null;
-    let lastAuthUid = auth.currentUser ? auth.currentUser.uid : null;
-
-    async function fetchAndRenderJobsFeed() {
-      try {
-        const snapshot = await getDocs(jobsQuery);
-        loadingSpinner.classList.add('hidden');
-        renderJobsFeed(snapshot.docs);
-      } catch (error) {
-        console.log('Feed error:', error);
-        loadingSpinner.innerHTML = '<p class="text-red-600 dark:text-red-400">Error loading jobs. Please refresh.</p>';
-      }
-    }
-
-    function clearJobFeedPolling() {
-      if (jobFeedPollerId) {
-        clearInterval(jobFeedPollerId);
-        jobFeedPollerId = null;
-      }
-    }
-
-    function startJobFeedPolling() {
-      clearJobFeedPolling();
-      fetchAndRenderJobsFeed();
-      jobFeedPollerId = setInterval(fetchAndRenderJobsFeed, 5000);
-    }
-
-    window.addEventListener('beforeunload', () => {
-      clearJobFeedPolling();
-    });
-
-    onAuthStateChanged(auth, (user) => {
-      const signedOut = lastAuthUid && !user;
-      lastAuthUid = user ? user.uid : null;
-      if (signedOut) {
-        clearJobFeedPolling();
-      }
-      startJobFeedPolling();
-      handleCheckoutSuccess(user);
-    });
-
-    startJobFeedPolling();
-
-    // Job form submit
-    document.getElementById('jobForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      if (!auth.currentUser) {
-        errorMsg.textContent = 'Sign in first to post jobs.';
-        return;
-      }
-
-      errorMsg.textContent = '';
-
-      const photos = [];
-
-      try {
-        const selectedFiles = Array.from(photosInput.files || []);
-        for (const file of selectedFiles) {
-          if (!file.type.startsWith('image/')) continue;
-          try {
-            const compressedBlob = await compressImage(file);
-            const timestamp = Date.now();
-            const safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-            const storagePath = `jobs/${auth.currentUser.uid}/${timestamp}_${safeFileName}`;
-            const fileRef = ref(storage, storagePath);
-            await uploadBytes(fileRef, compressedBlob);
-            const downloadURL = await getDownloadURL(fileRef);
-            photos.push(downloadURL);
-          } catch (compressionErr) {
-            console.log('Image compression error:', compressionErr);
-            alert('Failed to compress one or more images. Please try again.');
-            return;
-          }
-        }
-      } catch (uploadErr) {
-        console.log('Photo upload error:', uploadErr);
-        alert('Failed to upload one or more photos. Please try again.');
-        return;
-      }
-
-      const job = {
-        title: document.getElementById('title').value,
-        desc: document.getElementById('desc').value,
-        category: document.getElementById('category').value,
-        skill: document.getElementById('skill').value,
-        callout: Number(document.getElementById('callout').value),
-        rate: Number(document.getElementById('rate').value),
-        hours: Number(document.getElementById('hours').value),
-        postcode: document.getElementById('postcode').value,
-        posterId: auth.currentUser.uid,
-        status: 'open',
-        createdAt: new Date(),
-        photos,
-        thumbnail: photos[0] || ''
-      };
-
-      try {
-        await addDoc(collection(db, 'jobs'), job);
-        alert('Job posted! Check your dashboard soon.');
-        e.target.reset();
-        preview.innerHTML = '';
-      } catch (err) {
-        errorMsg.textContent = 'Error posting: ' + err.message;
-        console.log('Error posting job:', err);
-        alert('Error posting job. Please try again.');
-      }
-    });
-  </script>
-
-  <div id="recaptcha-container"></div>
+  <!-- Scripts -->
+  <script type="module" src="/index-app.js" defer></script>
 </body>
 </html>

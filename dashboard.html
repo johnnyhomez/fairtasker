@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - FairTasker</title>
+  <meta name="description" content="Your FairTasker dashboard. Manage posted jobs, track claimed gigs, and monitor earnings with complete transparency."/>
+  <meta name="robots" content="noindex, nofollow"/>
+  
+  <link rel="preconnect" href="https://www.googleapis.com"/>
+  <link rel="preconnect" href="https://www.gstatic.com"/>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sonner@latest"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#10b981',
+            primaryDark: '#047857',
+            accent: '#8b5cf6'
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    html, body { font-family: 'Inter', sans-serif; }
+    .glass-card { @apply rounded-2xl border border-white/30 bg-white/70 backdrop-blur-xl shadow-xl transition-all duration-300 dark:border-gray-800/50 dark:bg-gray-900/50; }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-white via-slate-50 to-slate-100 text-gray-900 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 dark:text-gray-100 transition-colors duration-300">
+  
+  <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+    <div class="absolute -top-40 -left-20 h-80 w-80 rounded-full bg-primary/20 blur-3xl opacity-60 dark:opacity-30"></div>
+    <div class="absolute top-1/2 -right-32 h-96 w-96 rounded-full bg-accent/20 blur-3xl opacity-50 dark:opacity-25"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 border-b border-white/40 bg-white/60 backdrop-blur-2xl dark:border-gray-800/60 dark:bg-gray-950/60">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+      <a href="/" class="flex items-center gap-3 transition hover:scale-105">
+        <span class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-lg font-black text-white shadow-lg">F</span>
+        <div>
+          <h1 class="text-xl font-black tracking-tight sm:text-2xl">FairTasker</h1>
+          <p class="text-xs font-medium text-primary dark:text-emerald-400">Fair gigs. Zero fees.</p>
+        </div>
+      </a>
+      
+      <div class="hidden md:flex items-center gap-1">
+        <a href="/" class="rounded-lg px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-200/50 dark:text-gray-300 dark:hover:bg-gray-800/50">Home</a>
+        <a href="/dashboard.html" class="rounded-lg px-4 py-2 text-sm font-semibold text-primary dark:text-emerald-400">Dashboard</a>
+        <a href="/about.html" class="rounded-lg px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-200/50 dark:text-gray-300 dark:hover:bg-gray-800/50">About</a>
+      </div>
+      
+      <div class="flex items-center gap-3">
+        <button id="themeToggle" class="rounded-xl border border-gray-300 bg-white/70 px-3 py-2 text-xs sm:text-sm font-semibold text-gray-700 transition hover:shadow-lg dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-200">🌙</button>
+        <div id="authContainer" class="flex items-center gap-2">
+          <button id="authMenuBtn" class="rounded-xl bg-gradient-to-r from-primary to-primaryDark px-4 py-2 text-xs sm:text-sm font-bold text-white shadow-lg transition hover:shadow-xl hover:scale-105">Sign In</button>
+        </div>
+        <span id="userEmail" class="hidden text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400"></span>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <h1 class="text-4xl font-black">Dashboard</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Manage your jobs and track earnings</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mb-8 flex gap-2 border-b border-gray-200 dark:border-gray-800">
+      <button id="postedTab" class="border-b-2 border-primary px-4 py-2 font-bold text-primary">Posted Jobs</button>
+      <button id="claimedTab" class="border-b-2 border-transparent px-4 py-2 font-semibold text-gray-600 transition hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100">Claimed Gigs</button>
+      <button id="completedTab" class="border-b-2 border-transparent px-4 py-2 font-semibold text-gray-600 transition hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100">Completed</button>
+    </div>
+
+    <!-- Auth Check -->
+    <div id="authCheck" class="glass-card p-8 text-center">
+      <p class="text-gray-600 dark:text-gray-400">Sign in to view your dashboard</p>
+    </div>
+
+    <!-- Posted Jobs Tab -->
+    <section id="postedSection" class="hidden space-y-6">
+      <div id="postedJobs" class="grid gap-6 md:grid-cols-2">
+        <!-- Posted jobs here -->
+      </div>
+      <div id="postedEmpty" class="rounded-2xl border-2 border-dashed border-gray-300 px-8 py-12 text-center dark:border-gray-700">
+        <p class="text-gray-600 dark:text-gray-400">No posted jobs yet. <a href="/" class="text-primary font-bold hover:underline">Post your first job</a></p>
+      </div>
+    </section>
+
+    <!-- Claimed Jobs Tab -->
+    <section id="claimedSection" class="hidden space-y-6">
+      <div id="claimedJobs" class="grid gap-6 md:grid-cols-2">
+        <!-- Claimed jobs here -->
+      </div>
+      <div id="claimedEmpty" class="rounded-2xl border-2 border-dashed border-gray-300 px-8 py-12 text-center dark:border-gray-700">
+        <p class="text-gray-600 dark:text-gray-400">No claimed gigs yet. <a href="/" class="text-primary font-bold hover:underline">Browse available jobs</a></p>
+      </div>
+    </section>
+
+    <!-- Completed Tab -->
+    <section id="completedSection" class="hidden space-y-6">
+      <div id="completedJobs" class="grid gap-6 md:grid-cols-2">
+        <!-- Completed jobs here -->
+      </div>
+      <div id="completedEmpty" class="rounded-2xl border-2 border-dashed border-gray-300 px-8 py-12 text-center dark:border-gray-700">
+        <p class="text-gray-600 dark:text-gray-400">No completed jobs yet.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-16 border-t border-white/40 bg-white/40 backdrop-blur-xl dark:border-gray-800/60 dark:bg-gray-950/40">
+    <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <p class="text-center text-sm text-gray-600 dark:text-gray-400">&copy; 2026 FairTasker. Built for fairness.</p>
+    </div>
+  </footer>
+
+  <script type="module" src="/dashboard-app.js" defer></script>
+</body>
+</html>
